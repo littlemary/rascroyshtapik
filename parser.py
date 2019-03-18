@@ -145,7 +145,7 @@ def sendtoport(itemval):
     elif (position > 2000):
         shift = shift3
     position=position+shift
-
+    print(position)
     if (minPos < position and position < maxPos):
 
         positionInt = int(position  * encoderDivider)
@@ -508,7 +508,7 @@ def showgrid(pos, clearmessage):
                         colorbg="lightblue"
                     lbl = Label(frame2, width="30", text=row[5], font=("Tahoma", 10), bg=colorbg, padx=10, pady=5)
                     lbl.grid(row=i, column=0, padx=1, pady=1)
-                    lbl = Label(frame2, width="30", text=row[14a], font=("Tahoma", 10), bg=colorbg, padx=10, pady=5)
+                    lbl = Label(frame2, width="30", text=row[14], font=("Tahoma", 10), bg=colorbg, padx=10, pady=5)
                     lbl.grid(row=i, column=1, padx=1, pady=1)
                     if row[19]==1 :
                         lbl = Label(frame2, width="30", text="Порезана", font=("Tahoma", 10), bg=colorbg, padx=10, pady=5)
@@ -619,8 +619,10 @@ showgrid(1, 0)
 ser = serial.Serial()
 ser.port = comtext
 ser.baudrate = 9600
-ser.dsrdtr = 1
-ser.timeout=0
+ser.bytesize=7
+ser.parity=serial.PARITY_EVEN
+ser.sropbits=1
+ser.timeout=0.1
 try:
     ser.open()
 except Exception as e:
