@@ -135,7 +135,10 @@ def sendtoport(itemval):
     shift2 = float(optionsrow[6])
     shift3 = float(optionsrow[7])
     encoderDivider=float(optionsrow[4])
-
+    minpodstavka = float(optionsrow[10])
+    dlinapodstavka = float(optionsrow[9])
+    if float(itemval) < minpodstavka:
+        itemval = float(itemval) + minpodstavka
     position = float(itemval)
     positionText = position
     if (position <= 1000):
@@ -395,6 +398,7 @@ def showtab2():
     posToGo.focus()
 
 def showgrid(pos, clearmessage):
+    global optionsrow
     if clearmessage==1:
         lbl_message["text"] = ""
         lbl_message["width"] = "100"
@@ -421,7 +425,7 @@ def showgrid(pos, clearmessage):
             but_next = Button(frame_tbl, text="<-", bg="red", command=lambda: showgrid(resultprev[0], 1))
             but_next.grid(row=1, column=0)
         but_send = Button(frame_tbl, text=u"Отослать текущую позицию",
-                          width=30, height=2,
+                          width=30, height=1,
                           font=("Tahoma", 20),
                           bg="orange", command=lambda: senditem(pos))
         but_send.grid(row=2, columnspan=5)
@@ -436,7 +440,7 @@ def showgrid(pos, clearmessage):
             if curshtapik==0:
                 curshtapik = result[0]
             if curshtapik!=result[0]:
-                lbl_message["text"] = u"Обратите внимание! Поменялся ортикул штапика."
+                lbl_message["text"] = u"Обратите внимание! Поменялся артикул штапика."
                 lbl_message["bg"] = "red"
                 lbl_message["width"] = "100"
                 lbl_message["height"] = "3"
@@ -463,8 +467,34 @@ def showgrid(pos, clearmessage):
             lbl = Label(frame_tbl, text=nit, font=("Tahoma", 15))
             lbl.grid(row=5, column=1, padx=1, pady=1)
 
+            sql1 = "SELECT * FROM `items` WHERE `a_id`=%s and status=0 order by id asc"
+            cur.execute(sql1, pos)
+            if cur.rowcount > 0:
+                result1 = cur.fetchone()
+
+                lbl = Label(frame_tbl, text="Текущая позиция", font=("Tahoma", 15))
+                lbl.grid(row=7, column=0, padx=1, pady=1)
+                lbl = Label(frame_tbl, text=result1[5], font=("Tahoma", 15))
+                lbl.grid(row=7, column=1, padx=1, pady=1)
+                lbl = Label(frame_tbl, text="Ячейка", font=("Tahoma", 15), width="20", bg="yellow")
+                lbl.grid(row=6, column=0, padx=1, pady=1)
+                lbl = Label(frame_tbl, text=result1[14], font=("Tahoma", 15), width="30", bg="yellow")
+                lbl.grid(row=6, column=1, padx=1, pady=1)
+
+                shtapikmin = optionsrow[10]
+                if int(result1[5]) < int(shtapikmin):
+                    lbl_message1["text"] = u"Обратите внимание! Используйте подставку!"
+                    lbl_message1["bg"] = "lightgreen"
+                    lbl_message1["width"] = "100"
+                    lbl_message1["height"] = "3"
+
+            else:
+                lbl = Label(frame_tbl, text="Все порезано. Возьмите другой штапик", font=("Tahoma", 15))
+                lbl.grid(row=6, columnspan=2, padx=1, pady=1)
+
+
             frame2_c = Frame(frame_tbl)
-            frame2_c.grid(row=6, columnspan="3", sticky=NW)
+            frame2_c.grid(row=8, columnspan="3", sticky=NW)
             # Add a canvas in that frame.
             canvas = Canvas(frame2_c, bg="grey")
             canvas.grid(row=0, column=0)
@@ -494,7 +524,7 @@ def showgrid(pos, clearmessage):
             with con.cursor() as cur:
                 i = 1
                 # Read a single record
-                sql = "SELECT * FROM `items` WHERE `a_id`=%s"
+                sql = "SELECT * FROM `items` WHERE `a_id`=%s order by id asc"
                 cur.execute(sql, (result[2]))
                 positem=0
                 for row in cur:
@@ -539,8 +569,6 @@ def showgrid(pos, clearmessage):
             w, h = bbox[2] - bbox[1], bbox[3] - bbox[1]
             dw, dh = int((w / COLS) * COLS_DISP), int((h / ROWS) * ROWS_DISP)
             canvas.configure(scrollregion=bbox, width=dw, height=dh)
-#            canvas.yview_scroll(SCROLL, -10, UNITS)
-            #but_calib.focus_set()
             but_send.focus_set()
     return
 
@@ -564,7 +592,9 @@ with con.cursor() as cur:
 
 
 
-lbl_head = Label(root, text=u"РАСКРОЙ ШТАПИКА", font=("Tahoma", 15), bg="white")
+lbl_message1 = Label(root, text="", font=("Tahoma", 12), width="0", height="0", bg="white")
+lbl_message1.grid(row=0, columnspan=4)
+
 lbl_message = Label(root, text="", font=("Tahoma", 12), width="0", height="0", bg="white")
 lbl_message.grid(row=1, columnspan=4)
 but_calib1 = Button(root,
@@ -581,7 +611,6 @@ but_import = Button(root,
            bg="orange", command=importfromxml
                   )
 
-lbl_head.grid(row=0, column=0)
 but_calib1.grid(row=2,column=2, padx=5, pady=30)
 but_import.grid(row=2,column=3, padx=5, pady=30)
 
