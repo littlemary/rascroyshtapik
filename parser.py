@@ -466,7 +466,7 @@ def showgrid(pos, clearmessage):
             frame2_c = Frame(frame_tbl)
             frame2_c.grid(row=6, columnspan="3", sticky=NW)
             # Add a canvas in that frame.
-            canvas = Canvas(frame2_c, bg="Yellow")
+            canvas = Canvas(frame2_c, bg="grey")
             canvas.grid(row=0, column=0)
 
             # Create a vertical scrollbar linked to the canvas.
@@ -531,16 +531,16 @@ def showgrid(pos, clearmessage):
             bbox = canvas.bbox(ALL)  # Get bounding box of canvas with Buttons.
             # print('canvas.bbox(tk.ALL): {}'.format(bbox))
             LABEL_BG = "#ccc"  # Light gray.
-            ROWS, COLS = 13, 9  # Size of grid.
-            ROWS_DISP = 10  # Number of rows to display.
-            COLS_DISP = 9  # Number of columns to display.
-
+            ROWS, COLS = i, 4  # Size of grid.
+            ROWS_DISP = 7  # Number of rows to display.
+            COLS_DISP = 4  # Number of columns to display.
             # Define the scrollable region as entire canvas with only the desired
             # number of rows and columns displayed.
             w, h = bbox[2] - bbox[1], bbox[3] - bbox[1]
             dw, dh = int((w / COLS) * COLS_DISP), int((h / ROWS) * ROWS_DISP)
             canvas.configure(scrollregion=bbox, width=dw, height=dh)
-
+#            canvas.yview_scroll(SCROLL, -10, UNITS)
+            #but_calib.focus_set()
             but_send.focus_set()
     return
 
@@ -562,7 +562,6 @@ with con.cursor() as cur:
             optionsrow[row[0]] = row[2]
 
 
-#ser=serial.Serial(comtext, 19200, dsrdtr = 1,timeout = 0)
 
 
 lbl_head = Label(root, text=u"РАСКРОЙ ШТАПИКА", font=("Tahoma", 15), bg="white")
