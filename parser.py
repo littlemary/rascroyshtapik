@@ -338,6 +338,10 @@ def skipitem(id):
         con.commit()
 
 def senditem(a_id):
+    global lblcuritem
+    global lblcurpos
+    lbltext1=''
+    lbltext2=''
     if iscolab == 0:
         lbl_message["text"] = u"Станок не отколиброван. Нажмите ОТКОЛИБРОВАТЬ."
         lbl_message["bg"] = "red"
@@ -347,12 +351,14 @@ def senditem(a_id):
 
     with con:
         cur = con.cursor()
-        sql = "SELECT id, longs FROM `items` WHERE a_id=%s and status=0 order by id asc"
+        sql = "SELECT id, longs, cellid FROM `items` WHERE a_id=%s and status=0 order by id asc"
         cur.execute(sql, (a_id))
         if cur.rowcount>0:
             result = cur.fetchone()
             longs = result[1]
             sendtoport(longs)
+            lbltext1=str(result[2])
+            lbltext2=str(result[1])
             sql = "update items set status=1 where id=%s";
             strarr = (result[0])
             cur.execute(sql, strarr)
@@ -365,11 +371,16 @@ def senditem(a_id):
             return (0)
 
     showgrid(a_id, 0)
+    lblcuritem.configure(text=lbltext1)
+    lblcurpos.configure(text=lbltext2)
+
 
 def resenditem(item_id):
+    global lblcuritem
+    global lblcurpos
     with con:
         cur = con.cursor()
-        sql = "SELECT id, longs, a_id FROM `items` WHERE id=%s"
+        sql = "SELECT id, longs, a_id, cellid FROM `items` WHERE id=%s"
         cur.execute(sql, (item_id))
         if cur.rowcount>0:
             result = cur.fetchone()
@@ -377,6 +388,8 @@ def resenditem(item_id):
             sendtoport(longs)
             a_id = result[2]
     showgrid(a_id, 0)
+    lblcuritem.configure(text=str(result[3]))
+    lblcurpos.configure(text=str(result[1]))
 
 def showtab1():
     but_tab1.configure(bg="yellow")
@@ -399,6 +412,8 @@ def showtab2():
 
 def showgrid(pos, clearmessage):
     global optionsrow
+    global lblcurpos
+    global lblcuritem
     if clearmessage==1:
         lbl_message["text"] = ""
         lbl_message["width"] = "100"
@@ -466,22 +481,22 @@ def showgrid(pos, clearmessage):
                 nit = 'одна'
             lbl = Label(frame_tbl, text=nit, font=("Tahoma", 15))
             lbl.grid(row=5, column=1, padx=1, pady=1)
+            lblcurpos = Label(frame_tbl, text='', font=("Tahoma", 15))
+            lblcuritem = Label(frame_tbl, text='', font=("Tahoma", 15))
 
+            lbl = Label(frame_tbl, text="Сейчас в станке", font=("Tahoma", 15))
+            lbl.grid(row=7, column=0, padx=1, pady=1)
+            lblcurpos.grid(row=7, column=1, padx=1, pady=1)
+            lbl = Label(frame_tbl, text="Ячейка", font=("Tahoma", 15), width="20", bg="yellow")
+            lbl.grid(row=6, column=0, padx=1, pady=1)
+            lblcuritem.grid(row=6, column=1, padx=1, pady=1)
+
+            shtapikmin = optionsrow[10]
             sql1 = "SELECT * FROM `items` WHERE `a_id`=%s and status=0 order by id asc"
             cur.execute(sql1, pos)
             if cur.rowcount > 0:
                 result1 = cur.fetchone()
 
-                lbl = Label(frame_tbl, text="Текущая позиция", font=("Tahoma", 15))
-                lbl.grid(row=7, column=0, padx=1, pady=1)
-                lbl = Label(frame_tbl, text=result1[5], font=("Tahoma", 15))
-                lbl.grid(row=7, column=1, padx=1, pady=1)
-                lbl = Label(frame_tbl, text="Ячейка", font=("Tahoma", 15), width="20", bg="yellow")
-                lbl.grid(row=6, column=0, padx=1, pady=1)
-                lbl = Label(frame_tbl, text=result1[14], font=("Tahoma", 15), width="30", bg="yellow")
-                lbl.grid(row=6, column=1, padx=1, pady=1)
-
-                shtapikmin = optionsrow[10]
                 if int(result1[5]) < int(shtapikmin):
                     lbl_message1["text"] = u"Обратите внимание! Используйте подставку!"
                     lbl_message1["bg"] = "lightgreen"
@@ -490,7 +505,7 @@ def showgrid(pos, clearmessage):
 
             else:
                 lbl = Label(frame_tbl, text="Все порезано. Возьмите другой штапик", font=("Tahoma", 15))
-                lbl.grid(row=6, columnspan=2, padx=1, pady=1)
+                #lbl.grid(row=6, columnspan=2, padx=1, pady=1)
 
 
             frame2_c = Frame(frame_tbl)
@@ -640,6 +655,8 @@ frame_tab2.grid(row=5, column=0, columnspan="5")
 posToGo = Entry(frame_tab2, width=30, bd=20, bg="lightyellow", font='Helvetica 25')
 labelItemCur = Label(frame_tab2, text="", font='Tahoma 25')
 
+lblcurpos = Label(frame_tbl, text='', font=("Tahoma", 15))
+lblcuritem = Label(frame_tbl, text='', font=("Tahoma", 15))
 
 comtext = "COM"+optionsrow[8]
 showgrid(1, 0)
