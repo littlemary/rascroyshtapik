@@ -10,7 +10,7 @@ iscolab=int(0)
 curshtapik = int(0)
 langsarray = []
 langsbuttonarray = {}
-
+curitemcolor = "lightgreen"
 
 
 #ser=serial.Serial("COM3", 19200, dsrdtr = 1,timeout = 0)
@@ -340,6 +340,7 @@ def skipitem(id):
 def senditem(a_id):
     global lblcuritem
     global lblcurpos
+    global lbl_color
     lbltext1=''
     lbltext2=''
     if iscolab == 0:
@@ -371,13 +372,22 @@ def senditem(a_id):
             return (0)
 
     showgrid(a_id, 0)
+    global curitemcolor
+    if curitemcolor=="lightgreen":
+        curitemcolor="yellow"
+    else:
+        curitemcolor = "lightgreen"
     lblcuritem.configure(text=lbltext1)
+    lblcuritem.configure(bg=curitemcolor)
+
+    lbl_color.configure(bg=curitemcolor)
     lblcurpos.configure(text=lbltext2)
 
 
 def resenditem(item_id):
     global lblcuritem
     global lblcurpos
+    global lbl_color
     with con:
         cur = con.cursor()
         sql = "SELECT id, longs, a_id, cellid FROM `items` WHERE id=%s"
@@ -390,6 +400,14 @@ def resenditem(item_id):
     showgrid(a_id, 0)
     lblcuritem.configure(text=str(result[3]))
     lblcurpos.configure(text=str(result[1]))
+    global curitemcolor
+    if curitemcolor=="lightgreen":
+        curitemcolor="yellow"
+    else:
+        curitemcolor = "lightgreen"
+    lblcuritem.configure(bg=curitemcolor)
+
+    lbl_color.configure(bg=curitemcolor)
 
 def showtab1():
     but_tab1.configure(bg="yellow")
@@ -414,6 +432,7 @@ def showgrid(pos, clearmessage):
     global optionsrow
     global lblcurpos
     global lblcuritem
+    global lbl_color
     if clearmessage==1:
         lbl_message["text"] = ""
         lbl_message["width"] = "100"
@@ -482,13 +501,13 @@ def showgrid(pos, clearmessage):
             lbl = Label(frame_tbl, text=nit, font=("Tahoma", 15))
             lbl.grid(row=5, column=1, padx=1, pady=1)
             lblcurpos = Label(frame_tbl, text='', font=("Tahoma", 15))
-            lblcuritem = Label(frame_tbl, text='', font=("Tahoma", 15))
+            lblcuritem = Label(frame_tbl, text='', font=("Tahoma", 15), width="20")
 
             lbl = Label(frame_tbl, text="Сейчас в станке", font=("Tahoma", 15))
             lbl.grid(row=7, column=0, padx=1, pady=1)
             lblcurpos.grid(row=7, column=1, padx=1, pady=1)
-            lbl = Label(frame_tbl, text="Ячейка", font=("Tahoma", 15), width="20", bg="yellow")
-            lbl.grid(row=6, column=0, padx=1, pady=1)
+            lbl_color = Label(frame_tbl, text="Ячейка", font=("Tahoma", 15), width="20")
+            lbl_color.grid(row=6, column=0, padx=1, pady=1)
             lblcuritem.grid(row=6, column=1, padx=1, pady=1)
 
             shtapikmin = optionsrow[10]
@@ -657,6 +676,7 @@ labelItemCur = Label(frame_tab2, text="", font='Tahoma 25')
 
 lblcurpos = Label(frame_tbl, text='', font=("Tahoma", 15))
 lblcuritem = Label(frame_tbl, text='', font=("Tahoma", 15))
+lbl_color = Label(frame_tbl, text="Ячейка", font=("Tahoma", 15), width="20")
 
 comtext = "COM"+optionsrow[8]
 showgrid(1, 0)
