@@ -137,8 +137,18 @@ def sendtoport(itemval):
     encoderDivider=float(optionsrow[4])
     minpodstavka = float(optionsrow[10])
     dlinapodstavka = float(optionsrow[9])
+    lbl_message1["text"] = ""
+    lbl_message1["bg"] = "white"
+    lbl_message1["width"] = "100"
+    lbl_message1["height"] = "3"
     if float(itemval) < minpodstavka:
-        itemval = float(itemval) + minpodstavka
+        lbl_message1["text"] = u"Обратите внимание! Используйте подставку!"
+        lbl_message1["bg"] = "lightgreen"
+        lbl_message1["width"] = "100"
+        lbl_message1["height"] = "3"
+
+    if float(itemval) < minpodstavka:
+        itemval = float(itemval) + dlinapodstavka
     position = float(itemval)
     positionText = position
     if (position <= 1000):
@@ -385,6 +395,7 @@ def senditem(a_id):
 
 
 def resenditem(item_id):
+    global optionsrow
     global lblcuritem
     global lblcurpos
     global lbl_color
@@ -397,6 +408,7 @@ def resenditem(item_id):
             longs = result[1]
             sendtoport(longs)
             a_id = result[2]
+
     showgrid(a_id, 0)
     lblcuritem.configure(text=str(result[3]))
     lblcurpos.configure(text=str(result[1]))
